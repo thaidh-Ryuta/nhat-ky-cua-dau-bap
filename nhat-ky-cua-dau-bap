@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhật ký của Đậu Bắp</title>
+    <!-- Sử dụng Tailwind CSS để làm đẹp giao diện -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Sử dụng font Inter từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icon library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .nav-button.active {
+            background-color: #4a90e2;
+            color: white;
+        }
+        .hidden-section, .hidden {
+            display: none;
+        }
+        /* Hiệu ứng loading */
+        .is-loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        .is-loading::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+         .prose h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .prose ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .prose li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        .prose li .icon {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="app-container" class="w-full max-w-4xl mx-auto p-4 min-h-screen">
+        <!-- Header -->
+        <header class="text-center my-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800">Nhật ký của Đậu Bắp 🌱</h1>
+            <p class="text-gray-500 mt-2">Nơi lưu giữ hành trình lớn khôn của con</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex justify-center space-x-2 md:space-x-4 mb-8 bg-white p-2 rounded-xl shadow-md">
+            <button data-target="developmentLogSection" class="nav-button active flex-1 md:flex-none flex items-center justify-center space-x-2 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition-all">
+                <i data-lucide="book-heart"></i>
+                <span>Nhật ký Phát triển</span>
+            </button>
+            <button data-target="wonderWeeksSection" class="nav-button flex-1 md:flex-none flex items-center justify-center space-x-2 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition-all">
+                <i data-lucide="brain-circuit"></i>
+                <span>Tuần Khủng Hoảng</span>
+            </button>
+            <button data-target="momentsSection" class="nav-button flex-1 md:flex-none flex items-center justify-center space-x-2 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition-all">
+                <i data-lucide="camera"></i>
+                <span>Khoảnh khắc</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <!-- 1. Development Log Section -->
+            <section id="developmentLogSection">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4">Thêm cột mốc mới</h2>
+                    <form id="logForm" class="space-y-4">
+                        <input type="date" id="logDate" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        <textarea id="logDescription" class="w-full h-28 p-3 border border-gray-300 rounded-lg" placeholder="Hôm nay con đã làm được gì? (Vd: Lần đầu tiên con lẫy)" required></textarea>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-all">Lưu cột mốc</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-bold text-gray-700 mb-4">Các cột mốc của con</h3>
+                    <div id="logsContainer" class="space-y-4">
+                        <p class="text-gray-500 text-center">Chưa có cột mốc nào được ghi lại...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Wonder Weeks Section -->
+            <section id="wonderWeeksSection" class="hidden-section">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4">Dự báo Tuần Khủng Hoảng</h2>
+                    <p class="text-gray-600 mb-4">Nhập ngày sinh của con để xem dự báo về tuần phát triển nhảy vọt sắp tới.</p>
+                    <form id="wonderWeekForm" class="space-y-4">
+                        <input type="date" id="birthDate" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        <button id="wonderWeekBtn" type="submit" class="w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition-all">Xem dự báo</button>
+                    </form>
+                </div>
+                <div id="wonderWeekResult" class="mt-8 bg-white p-6 rounded-xl shadow-md hidden">
+                    <!-- Wonder week result will be here -->
+                </div>
+            </section>
+
+            <!-- 3. Moments Section -->
+            <section id="momentsSection" class="hidden-section">
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4">Thêm khoảnh khắc mới</h2>
+                    <form id="momentForm" class="space-y-4">
+                        <input type="text" id="momentTitle" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Tiêu đề khoảnh khắc..." required>
+                        <input type="file" id="momentImage" accept="image/*" class="w-full p-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                        <p class="text-xs text-gray-500">Lưu ý: Nên chọn ảnh có dung lượng nhỏ (dưới 1MB) để tải lên nhanh hơn.</p>
+                        <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-all">Lưu khoảnh khắc</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                     <h3 class="text-2xl font-bold text-gray-700 mb-4">Album của con</h3>
+                    <div id="momentsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                         <p class="text-gray-500 text-center col-span-full">Chưa có khoảnh khắc nào được lưu...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 mb-4">
+            <p class="text-xs text-gray-400">Mã định danh của bạn (chia sẻ nếu cần): <span id="userIdDisplay" class="font-mono"></span></p>
+        </footer>
+    </div>
+    
+    <!-- Custom Modal -->
+    <div id="customModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
+      <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+        <div class="mt-3 text-center">
+          <h3 id="modalTitle" class="text-xl leading-6 font-bold text-gray-900"></h3>
+          <div class="mt-2 px-7 py-3">
+            <p id="modalMessage" class="text-sm text-gray-600"></p>
+          </div>
+          <div id="modalActions" class="items-center px-4 py-3 space-x-4">
+            <button id="modalConfirmBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Xác nhận</button>
+            <button id="modalCancelBtn" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">Hủy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script type="module">
+        // --- BƯỚC 1: CẤU HÌNH FIREBASE ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // --- BƯỚC 2: KHỞI TẠO FIREBASE ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let app, auth, db, userId;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Lỗi khởi tạo Firebase:", e);
+            document.body.innerHTML = `<div class="text-center p-8 text-red-600">Lỗi nghiêm trọng: Không thể khởi tạo Firebase. Vui lòng kiểm tra cấu hình.</div>`;
+        }
+
+        // --- BƯỚC 3: XÁC THỰC NGƯỜI DÙNG ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('userIdDisplay').textContent = userId;
+                loadDevelopmentLogs();
+                loadMoments();
+            } else {
+                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                try {
+                    if (initialToken) {
+                        await signInWithCustomToken(auth, initialToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Lỗi đăng nhập:", error);
+                }
+            }
+        });
+
+        // --- MODAL LOGIC ---
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        let confirmCallback = null;
+
+        function showModal(title, message, onConfirmCallback = null) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            confirmCallback = onConfirmCallback;
+
+            if (onConfirmCallback) {
+                modalConfirmBtn.classList.remove('hidden');
+                modalCancelBtn.classList.remove('hidden');
+            } else {
+                modalConfirmBtn.classList.remove('hidden');
+                modalCancelBtn.classList.add('hidden');
+            }
+            customModal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            customModal.classList.add('hidden');
+            confirmCallback = null;
+        }
+
+        modalConfirmBtn.addEventListener('click', () => {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            hideModal();
+        });
+        modalCancelBtn.addEventListener('click', hideModal);
+
+        // --- GIAO DIỆN VÀ ĐIỀU HƯỚNG ---
+        const navButtons = document.querySelectorAll('.nav-button');
+        const sections = document.querySelectorAll('main section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const targetId = button.dataset.target;
+                sections.forEach(section => section.classList.add('hidden-section'));
+                document.getElementById(targetId).classList.remove('hidden-section');
+            });
+        });
+        
+        lucide.createIcons();
+
+        // --- TÍNH NĂNG 1: NHẬT KÝ PHÁT TRIỂN ---
+        const logForm = document.getElementById('logForm');
+        const logsContainer = document.getElementById('logsContainer');
+
+        logForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const date = document.getElementById('logDate').value;
+            const description = document.getElementById('logDescription').value;
+            
+            if (!userId) { showModal("Lỗi", "Vui lòng chờ xác thực người dùng."); return; }
+
+            try {
+                const logsCollection = collection(db, `artifacts/${appId}/users/${userId}/development_logs`);
+                await addDoc(logsCollection, {
+                    date: date,
+                    description: description,
+                    createdAt: serverTimestamp()
+                });
+                logForm.reset();
+            } catch (error) {
+                console.error("Lỗi khi thêm cột mốc:", error);
+                showModal("Lỗi", "Đã có lỗi xảy ra. Vui lòng thử lại.");
+            }
+        });
+
+        function loadDevelopmentLogs() {
+            if (!userId) return;
+            const logsCollection = collection(db, `artifacts/${appId}/users/${userId}/development_logs`);
+            const q = query(logsCollection, orderBy("date", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                logsContainer.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center">Chưa có cột mốc nào được ghi lại...</p>` : '';
+                snapshot.forEach(docSnap => {
+                    const log = docSnap.data();
+                    const logEl = document.createElement('div');
+                    logEl.className = 'bg-white p-4 rounded-lg shadow-sm flex justify-between items-start';
+                    logEl.innerHTML = `
+                        <div>
+                            <p class="font-bold text-blue-700">${new Date(log.date).toLocaleDateString('vi-VN')}</p>
+                            <p class="text-gray-600 mt-1">${log.description}</p>
+                        </div>
+                        <button data-id="${docSnap.id}" class="delete-log-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    `;
+                    logsContainer.appendChild(logEl);
+                });
+                lucide.createIcons();
+                document.querySelectorAll('.delete-log-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        showModal("Xác nhận xóa", "Bạn có chắc muốn xóa cột mốc này?", async () => {
+                            const docId = btn.dataset.id;
+                            await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/development_logs`, docId));
+                        });
+                    });
+                });
+            });
+        }
+
+        // --- TÍNH NĂNG 2: TUẦN KHỦNG HOẢNG (OFFLINE) ---
+        const wonderWeekForm = document.getElementById('wonderWeekForm');
+        const wonderWeekResult = document.getElementById('wonderWeekResult');
+        
+        const wonderWeeksData = {
+            5: {
+                title: "Thế giới của những cảm giác thay đổi",
+                signs: ["Quấy khóc nhiều hơn, đòi bú thường xuyên", "Ngủ ít hơn, giấc ngủ không sâu", "Đòi được ôm ấp, vỗ về nhiều hơn"],
+                skills: ["Bắt đầu có nụ cười chủ động (social smile)", "Tỉnh táo và quan sát xung quanh nhiều hơn", "Phát ra những âm thanh gừ gừ đầu tiên"],
+                tips: ["Tăng cường ôm ấp, da tiếp da", "Nói chuyện và hát cho bé nghe thường xuyên", "Cho bé xem các vật có màu sắc tương phản cao (đen, trắng)"]
+            },
+            8: {
+                title: "Thế giới của các quy luật",
+                signs: ["Bám mẹ hơn, dễ giật mình", "Tâm trạng thất thường", "Có thể từ chối bú hoặc bú vặt"],
+                skills: ["Bắt đầu kiểm soát được đầu và cổ tốt hơn", "Khám phá tay và chân của mình", "Phát ra nhiều âm thanh đa dạng hơn"],
+                tips: ["Tạo một lịch trình sinh hoạt ổn định", "Chơi các trò chơi đơn giản như giơ đồ vật trước mặt bé", "Massage nhẹ nhàng để giúp bé thư giãn"]
+            },
+            12: {
+                title: "Thế giới của những chuyển tiếp suôn sẻ",
+                signs: ["Ít quấy khóc hơn tuần 8 nhưng vẫn cần sự chú ý", "Muốn được 'trò chuyện' nhiều hơn", "Thích thú với các chuyển động"],
+                skills: ["Bắt đầu lật từ ngửa sang nghiêng", "Cầm nắm đồ vật một cách có chủ đích hơn", "Phản ứng với âm thanh bằng cách quay đầu"],
+                tips: ["Cho bé nằm sấp (tummy time) nhiều hơn để rèn luyện cơ bắp", "Đưa cho bé các đồ chơi an toàn để cầm nắm", "Bắt chước các âm thanh của bé để khuyến khích giao tiếp"]
+            },
+            19: {
+                title: "Thế giới của các sự kiện",
+                signs: ["Khủng hoảng ngủ (ngủ ngày ngắn, đêm thức nhiều)", "Biếng ăn, dễ bị phân tâm khi bú", "Cáu kỉnh, khó ở"],
+                skills: ["Bắt đầu trườn hoặc lật thành thạo", "Hiểu được chuỗi sự kiện đơn giản (vd: thấy mẹ mặc áo khoác là biết sắp đi chơi)", "Bập bẹ các âm thanh phức tạp hơn"],
+                tips: ["Kiên nhẫn với giấc ngủ của bé, thiết lập trình tự đi ngủ", "Chơi ú oà để giúp bé hiểu về sự tồn tại của vật thể", "Đọc sách cho bé nghe hàng ngày"]
+            },
+            26: {
+                title: "Thế giới của các mối quan hệ",
+                signs: ["Nỗi sợ người lạ, bám mẹ chặt hơn", "Thức dậy khóc đêm, cần mẹ dỗ dành", "Thử ném đồ ăn hoặc đồ chơi"],
+                skills: ["Bắt đầu ngồi vững không cần trợ giúp", "Chuyển đồ vật từ tay này sang tay kia", "Hiểu được khoảng cách (xa, gần)"],
+                tips: ["Tôn trọng nỗi sợ của bé, đừng ép bé theo người lạ", "Tạo không gian an toàn để bé tập ngồi và khám phá", "Gọi tên các đồ vật và hành động để giúp bé xây dựng mối liên hệ"]
+            }
+        };
+
+        wonderWeekForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const birthDate = new Date(document.getElementById('birthDate').value);
+            if (isNaN(birthDate.getTime())) {
+                showModal("Lỗi", "Ngày sinh không hợp lệ.");
+                return;
+            }
+
+            const today = new Date();
+            const ageInWeeks = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24 * 7));
+
+            const nextWonderWeekKey = Object.keys(wonderWeeksData).find(week => parseInt(week) >= ageInWeeks);
+
+            wonderWeekResult.classList.remove('hidden');
+            if (nextWonderWeekKey) {
+                const data = wonderWeeksData[nextWonderWeekKey];
+                let html = `
+                    <p class="text-center text-gray-600 mb-4">Bé nhà bạn hiện được <strong>${ageInWeeks}</strong> tuần tuổi. Tuần khủng hoảng sắp tới là:</p>
+                    <h2 class="text-2xl font-bold text-purple-700 text-center mb-2">Tuần ${nextWonderWeekKey}: ${data.title}</h2>
+                    <div class="prose max-w-none mt-6">
+                        <h3><i class="icon" data-lucide="alert-circle"></i>Dấu hiệu nhận biết</h3>
+                        <ul>${data.signs.map(item => `<li><span class="icon"><i data-lucide="check-circle-2"></i></span><span>${item}</span></li>`).join('')}</ul>
+                        <h3><i class="icon" data-lucide="sparkles"></i>Kỹ năng mới</h3>
+                        <ul>${data.skills.map(item => `<li><span class="icon"><i data-lucide="check-circle-2"></i></span><span>${item}</span></li>`).join('')}</ul>
+                        <h3><i class="icon" data-lucide="heart-handshake"></i>Gợi ý cho ba mẹ</h3>
+                        <ul>${data.tips.map(item => `<li><span class="icon"><i data-lucide="check-circle-2"></i></span><span>${item}</span></li>`).join('')}</ul>
+                    </div>
+                `;
+                wonderWeekResult.innerHTML = html;
+            } else {
+                wonderWeekResult.innerHTML = `<p class="text-center text-gray-600">Bé đã lớn và vượt qua các tuần khủng hoảng đầu đời được lập trình sẵn trong ứng dụng. Chúc mừng ba mẹ và bé!</p>`;
+            }
+            lucide.createIcons();
+        });
+
+
+        // --- TÍNH NĂNG 3: KHOẢNH KHẮC ---
+        const momentForm = document.getElementById('momentForm');
+        const momentsContainer = document.getElementById('momentsContainer');
+        
+        momentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('momentTitle').value;
+            const imageFile = document.getElementById('momentImage').files[0];
+
+            if (!userId) { showModal("Lỗi", "Vui lòng chờ xác thực người dùng."); return; }
+            if (!imageFile) { showModal("Thông báo", "Vui lòng chọn một hình ảnh."); return; }
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(imageFile);
+            reader.onload = async () => {
+                const imageData = reader.result;
+                try {
+                    const momentsCollection = collection(db, `artifacts/${appId}/users/${userId}/moments`);
+                    await addDoc(momentsCollection, {
+                        title: title,
+                        imageData: imageData,
+                        createdAt: serverTimestamp()
+                    });
+                    momentForm.reset();
+                } catch (error) {
+                    console.error("Lỗi khi lưu khoảnh khắc:", error);
+                    showModal("Lỗi", `Đã có lỗi xảy ra. Có thể do ảnh quá lớn. Lỗi: ${error.message}`);
+                }
+            };
+            reader.onerror = (error) => {
+                console.error("Lỗi đọc file:", error);
+                showModal("Lỗi", "Không thể đọc file ảnh.");
+            };
+        });
+
+        function loadMoments() {
+            if (!userId) return;
+            const momentsCollection = collection(db, `artifacts/${appId}/users/${userId}/moments`);
+            const q = query(momentsCollection, orderBy("createdAt", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                momentsContainer.innerHTML = snapshot.empty ? `<p class="text-gray-500 text-center col-span-full">Chưa có khoảnh khắc nào được lưu...</p>` : '';
+                snapshot.forEach(docSnap => {
+                    const moment = docSnap.data();
+                    const momentEl = document.createElement('div');
+                    momentEl.className = 'bg-white rounded-lg shadow-md overflow-hidden group relative';
+                    momentEl.innerHTML = `
+                        <img src="${moment.imageData}" alt="${moment.title}" class="w-full h-48 object-cover">
+                        <div class="p-3">
+                            <p class="font-semibold text-gray-700 truncate">${moment.title}</p>
+                        </div>
+                        <button data-id="${docSnap.id}" class="delete-moment-btn absolute top-2 right-2 bg-white/70 text-gray-700 p-2 rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    `;
+                    momentsContainer.appendChild(momentEl);
+                });
+                lucide.createIcons();
+                document.querySelectorAll('.delete-moment-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        showModal("Xác nhận xóa", "Bạn có chắc muốn xóa khoảnh khắc này?", async () => {
+                            const docId = btn.dataset.id;
+                            await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/moments`, docId));
+                        });
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
