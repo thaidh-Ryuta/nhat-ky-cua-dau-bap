@@ -190,7 +190,23 @@
 
     <script type="module">
         // --- BƯỚC 1: CẤU HÌNH FIREBASE ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCr1Db8DKPQB6BTF4DZd6QbvMF2LZ2qWWc",
+  authDomain: "nhat-ky-cua-dau-bap.firebaseapp.com",
+  projectId: "nhat-ky-cua-dau-bap",
+  storageBucket: "nhat-ky-cua-dau-bap.firebasestorage.app",
+  messagingSenderId: "641324057128",
+  appId: "1:641324057128:web:7ce9489aa78f7258852b1d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
         // --- BƯỚC 2: KHỞI TẠO FIREBASE ---
