@@ -25,7 +25,6 @@
         .hidden-section, .hidden {
             display: none;
         }
-        /* Hiệu ứng loading */
         .is-loading {
             position: relative;
             color: transparent !important;
@@ -47,20 +46,10 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
          .prose h3 {
             font-size: 1.25rem;
             font-weight: 700;
@@ -68,21 +57,9 @@
             margin-top: 1.5rem;
             margin-bottom: 0.75rem;
         }
-        .prose ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        .prose li {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-        .prose li .icon {
-            margin-right: 0.75rem;
-            margin-top: 0.25rem;
-            color: #3b82f6;
-            flex-shrink: 0;
-        }
+        .prose ul { list-style: none; padding-left: 0; }
+        .prose li { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
+        .prose li .icon { margin-right: 0.75rem; margin-top: 0.25rem; color: #3b82f6; flex-shrink: 0; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -167,7 +144,7 @@
 
         <!-- Footer -->
         <footer class="text-center mt-12 mb-4">
-            <p class="text-xs text-gray-400">Mã định danh của bạn (chia sẻ nếu cần): <span id="userIdDisplay" class="font-mono"></span></p>
+            <p class="text-xs text-gray-400">Mã định danh của bạn: <span id="userIdDisplay" class="font-mono"></span></p>
         </footer>
     </div>
     
@@ -190,61 +167,55 @@
 
     <script type="module">
         // --- BƯỚC 1: CẤU HÌNH FIREBASE ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCr1Db8DKPQB6BTF4DZd6QbvMF2LZ2qWWc",
-  authDomain: "nhat-ky-cua-dau-bap.firebaseapp.com",
-  projectId: "nhat-ky-cua-dau-bap",
-  storageBucket: "nhat-ky-cua-dau-bap.firebasestorage.app",
-  messagingSenderId: "641324057128",
-  appId: "1:641324057128:web:7ce9489aa78f7258852b1d"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // !!! QUAN TRỌNG: Dán đối tượng cấu hình Firebase của bạn vào đây !!!
+        // Bạn có thể lấy nó từ Bước 3 trong hướng dẫn.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr1Db8DKPQB6BTF4DZd6QbvMF2LZ2qWWc",
+            authDomain: "nhat-ky-cua-dau-bap.firebaseapp.com",
+            projectId: "nhat-ky-cua-dau-bap",
+            storageBucket: "nhat-ky-cua-dau-bap.firebasestorage.app",
+            messagingSenderId: "641324057128",
+            appId: "1:641324057128:web:7ce9489aa78f7258852b1d"
+        };
         
         // --- BƯỚC 2: KHỞI TẠO FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         let app, auth, db, userId;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Lỗi khởi tạo Firebase:", e);
-            document.body.innerHTML = `<div class="text-center p-8 text-red-600">Lỗi nghiêm trọng: Không thể khởi tạo Firebase. Vui lòng kiểm tra cấu hình.</div>`;
+        // Kiểm tra xem cấu hình đã được thay đổi chưa
+        if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+            document.body.innerHTML = `<div class="text-center p-8 text-red-600">Lỗi cấu hình: Vui lòng dán thông tin firebaseConfig của bạn vào tệp index.html.</div>`;
+        } else {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            } catch (e) {
+                console.error("Lỗi khởi tạo Firebase:", e);
+                document.body.innerHTML = `<div class="text-center p-8 text-red-600">Lỗi nghiêm trọng: Không thể khởi tạo Firebase. Vui lòng kiểm tra lại cấu hình đã dán.</div>`;
+            }
         }
 
         // --- BƯỚC 3: XÁC THỰC NGƯỜI DÙNG ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                document.getElementById('userIdDisplay').textContent = userId;
-                loadDevelopmentLogs();
-                loadMoments();
-            } else {
-                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                try {
-                    if (initialToken) {
-                        await signInWithCustomToken(auth, initialToken);
-                    } else {
+        if(auth) {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    document.getElementById('userIdDisplay').textContent = userId;
+                    loadDevelopmentLogs();
+                    loadMoments();
+                } else {
+                    try {
                         await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error("Lỗi đăng nhập ẩn danh:", error);
                     }
-                } catch (error) {
-                    console.error("Lỗi đăng nhập:", error);
                 }
-            }
-        });
+            });
+        }
 
         // --- MODAL LOGIC ---
         const customModal = document.getElementById('customModal');
@@ -310,7 +281,8 @@ const app = initializeApp(firebaseConfig);};
             if (!userId) { showModal("Lỗi", "Vui lòng chờ xác thực người dùng."); return; }
 
             try {
-                const logsCollection = collection(db, `artifacts/${appId}/users/${userId}/development_logs`);
+                // Thay đổi đường dẫn Firestore để đơn giản hơn
+                const logsCollection = collection(db, `users/${userId}/development_logs`);
                 await addDoc(logsCollection, {
                     date: date,
                     description: description,
@@ -325,7 +297,7 @@ const app = initializeApp(firebaseConfig);};
 
         function loadDevelopmentLogs() {
             if (!userId) return;
-            const logsCollection = collection(db, `artifacts/${appId}/users/${userId}/development_logs`);
+            const logsCollection = collection(db, `users/${userId}/development_logs`);
             const q = query(logsCollection, orderBy("date", "desc"));
 
             onSnapshot(q, (snapshot) => {
@@ -350,7 +322,7 @@ const app = initializeApp(firebaseConfig);};
                     btn.addEventListener('click', () => {
                         showModal("Xác nhận xóa", "Bạn có chắc muốn xóa cột mốc này?", async () => {
                             const docId = btn.dataset.id;
-                            await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/development_logs`, docId));
+                            await deleteDoc(doc(db, `users/${userId}/development_logs`, docId));
                         });
                     });
                 });
@@ -362,36 +334,11 @@ const app = initializeApp(firebaseConfig);};
         const wonderWeekResult = document.getElementById('wonderWeekResult');
         
         const wonderWeeksData = {
-            5: {
-                title: "Thế giới của những cảm giác thay đổi",
-                signs: ["Quấy khóc nhiều hơn, đòi bú thường xuyên", "Ngủ ít hơn, giấc ngủ không sâu", "Đòi được ôm ấp, vỗ về nhiều hơn"],
-                skills: ["Bắt đầu có nụ cười chủ động (social smile)", "Tỉnh táo và quan sát xung quanh nhiều hơn", "Phát ra những âm thanh gừ gừ đầu tiên"],
-                tips: ["Tăng cường ôm ấp, da tiếp da", "Nói chuyện và hát cho bé nghe thường xuyên", "Cho bé xem các vật có màu sắc tương phản cao (đen, trắng)"]
-            },
-            8: {
-                title: "Thế giới của các quy luật",
-                signs: ["Bám mẹ hơn, dễ giật mình", "Tâm trạng thất thường", "Có thể từ chối bú hoặc bú vặt"],
-                skills: ["Bắt đầu kiểm soát được đầu và cổ tốt hơn", "Khám phá tay và chân của mình", "Phát ra nhiều âm thanh đa dạng hơn"],
-                tips: ["Tạo một lịch trình sinh hoạt ổn định", "Chơi các trò chơi đơn giản như giơ đồ vật trước mặt bé", "Massage nhẹ nhàng để giúp bé thư giãn"]
-            },
-            12: {
-                title: "Thế giới của những chuyển tiếp suôn sẻ",
-                signs: ["Ít quấy khóc hơn tuần 8 nhưng vẫn cần sự chú ý", "Muốn được 'trò chuyện' nhiều hơn", "Thích thú với các chuyển động"],
-                skills: ["Bắt đầu lật từ ngửa sang nghiêng", "Cầm nắm đồ vật một cách có chủ đích hơn", "Phản ứng với âm thanh bằng cách quay đầu"],
-                tips: ["Cho bé nằm sấp (tummy time) nhiều hơn để rèn luyện cơ bắp", "Đưa cho bé các đồ chơi an toàn để cầm nắm", "Bắt chước các âm thanh của bé để khuyến khích giao tiếp"]
-            },
-            19: {
-                title: "Thế giới của các sự kiện",
-                signs: ["Khủng hoảng ngủ (ngủ ngày ngắn, đêm thức nhiều)", "Biếng ăn, dễ bị phân tâm khi bú", "Cáu kỉnh, khó ở"],
-                skills: ["Bắt đầu trườn hoặc lật thành thạo", "Hiểu được chuỗi sự kiện đơn giản (vd: thấy mẹ mặc áo khoác là biết sắp đi chơi)", "Bập bẹ các âm thanh phức tạp hơn"],
-                tips: ["Kiên nhẫn với giấc ngủ của bé, thiết lập trình tự đi ngủ", "Chơi ú oà để giúp bé hiểu về sự tồn tại của vật thể", "Đọc sách cho bé nghe hàng ngày"]
-            },
-            26: {
-                title: "Thế giới của các mối quan hệ",
-                signs: ["Nỗi sợ người lạ, bám mẹ chặt hơn", "Thức dậy khóc đêm, cần mẹ dỗ dành", "Thử ném đồ ăn hoặc đồ chơi"],
-                skills: ["Bắt đầu ngồi vững không cần trợ giúp", "Chuyển đồ vật từ tay này sang tay kia", "Hiểu được khoảng cách (xa, gần)"],
-                tips: ["Tôn trọng nỗi sợ của bé, đừng ép bé theo người lạ", "Tạo không gian an toàn để bé tập ngồi và khám phá", "Gọi tên các đồ vật và hành động để giúp bé xây dựng mối liên hệ"]
-            }
+            5: { title: "Thế giới của những cảm giác thay đổi", signs: ["Quấy khóc nhiều hơn, đòi bú thường xuyên", "Ngủ ít hơn, giấc ngủ không sâu", "Đòi được ôm ấp, vỗ về nhiều hơn"], skills: ["Bắt đầu có nụ cười chủ động (social smile)", "Tỉnh táo và quan sát xung quanh nhiều hơn", "Phát ra những âm thanh gừ gừ đầu tiên"], tips: ["Tăng cường ôm ấp, da tiếp da", "Nói chuyện và hát cho bé nghe thường xuyên", "Cho bé xem các vật có màu sắc tương phản cao (đen, trắng)"] },
+            8: { title: "Thế giới của các quy luật", signs: ["Bám mẹ hơn, dễ giật mình", "Tâm trạng thất thường", "Có thể từ chối bú hoặc bú vặt"], skills: ["Bắt đầu kiểm soát được đầu và cổ tốt hơn", "Khám phá tay và chân của mình", "Phát ra nhiều âm thanh đa dạng hơn"], tips: ["Tạo một lịch trình sinh hoạt ổn định", "Chơi các trò chơi đơn giản như giơ đồ vật trước mặt bé", "Massage nhẹ nhàng để giúp bé thư giãn"] },
+            12: { title: "Thế giới của những chuyển tiếp suôn sẻ", signs: ["Ít quấy khóc hơn tuần 8 nhưng vẫn cần sự chú ý", "Muốn được 'trò chuyện' nhiều hơn", "Thích thú với các chuyển động"], skills: ["Bắt đầu lật từ ngửa sang nghiêng", "Cầm nắm đồ vật một cách có chủ đích hơn", "Phản ứng với âm thanh bằng cách quay đầu"], tips: ["Cho bé nằm sấp (tummy time) nhiều hơn để rèn luyện cơ bắp", "Đưa cho bé các đồ chơi an toàn để cầm nắm", "Bắt chước các âm thanh của bé để khuyến khích giao tiếp"] },
+            19: { title: "Thế giới của các sự kiện", signs: ["Khủng hoảng ngủ (ngủ ngày ngắn, đêm thức nhiều)", "Biếng ăn, dễ bị phân tâm khi bú", "Cáu kỉnh, khó ở"], skills: ["Bắt đầu trườn hoặc lật thành thạo", "Hiểu được chuỗi sự kiện đơn giản (vd: thấy mẹ mặc áo khoác là biết sắp đi chơi)", "Bập bẹ các âm thanh phức tạp hơn"], tips: ["Kiên nhẫn với giấc ngủ của bé, thiết lập trình tự đi ngủ", "Chơi ú oà để giúp bé hiểu về sự tồn tại của vật thể", "Đọc sách cho bé nghe hàng ngày"] },
+            26: { title: "Thế giới của các mối quan hệ", signs: ["Nỗi sợ người lạ, bám mẹ chặt hơn", "Thức dậy khóc đêm, cần mẹ dỗ dành", "Thử ném đồ ăn hoặc đồ chơi"], skills: ["Bắt đầu ngồi vững không cần trợ giúp", "Chuyển đồ vật từ tay này sang tay kia", "Hiểu được khoảng cách (xa, gần)"], tips: ["Tôn trọng nỗi sợ của bé, đừng ép bé theo người lạ", "Tạo không gian an toàn để bé tập ngồi và khám phá", "Gọi tên các đồ vật và hành động để giúp bé xây dựng mối liên hệ"] }
         };
 
         wonderWeekForm.addEventListener('submit', (e) => {
@@ -404,7 +351,6 @@ const app = initializeApp(firebaseConfig);};
 
             const today = new Date();
             const ageInWeeks = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24 * 7));
-
             const nextWonderWeekKey = Object.keys(wonderWeeksData).find(week => parseInt(week) >= ageInWeeks);
 
             wonderWeekResult.classList.remove('hidden');
@@ -447,7 +393,7 @@ const app = initializeApp(firebaseConfig);};
             reader.onload = async () => {
                 const imageData = reader.result;
                 try {
-                    const momentsCollection = collection(db, `artifacts/${appId}/users/${userId}/moments`);
+                    const momentsCollection = collection(db, `users/${userId}/moments`);
                     await addDoc(momentsCollection, {
                         title: title,
                         imageData: imageData,
@@ -467,7 +413,7 @@ const app = initializeApp(firebaseConfig);};
 
         function loadMoments() {
             if (!userId) return;
-            const momentsCollection = collection(db, `artifacts/${appId}/users/${userId}/moments`);
+            const momentsCollection = collection(db, `users/${userId}/moments`);
             const q = query(momentsCollection, orderBy("createdAt", "desc"));
 
             onSnapshot(q, (snapshot) => {
@@ -492,7 +438,7 @@ const app = initializeApp(firebaseConfig);};
                     btn.addEventListener('click', () => {
                         showModal("Xác nhận xóa", "Bạn có chắc muốn xóa khoảnh khắc này?", async () => {
                             const docId = btn.dataset.id;
-                            await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/moments`, docId));
+                            await deleteDoc(doc(db, `users/${userId}/moments`, docId));
                         });
                     });
                 });
